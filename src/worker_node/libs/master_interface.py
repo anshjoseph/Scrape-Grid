@@ -113,12 +113,21 @@ class MasterInterface:
     # -------------------------------------------------
     # Job result submission
     # -------------------------------------------------
-    def add_job_result(self, worker_id: UUID, payload: Dict[str, Any]) -> bool:
-        url = f"{self._base_url}/jobs/{worker_id}/add-result"
+    def add_job_result(
+        self,
+        worker_id: UUID,
+        job_id: UUID,
+        payload: Dict[str, Any],
+    ) -> bool:
+        url = f"{self._base_url}/{worker_id}/jobs/{job_id}/add-result"
 
         logger.info(
             "Submitting job result",
-            extra={"worker_id": str(worker_id)},
+            extra={
+                "worker_id": str(worker_id),
+                "job_id": str(job_id),
+                "url": url,
+            },
         )
 
         try:
@@ -132,10 +141,13 @@ class MasterInterface:
                 timeout=self._timeout,
             )
 
-            if resp.status_code == 200:
+            if resp.status_code in (200, 201):
                 logger.info(
                     "Job result submitted successfully",
-                    extra={"worker_id": str(worker_id)},
+                    extra={
+                        "worker_id": str(worker_id),
+                        "job_id": str(job_id),
+                    },
                 )
                 return True
 
@@ -145,6 +157,7 @@ class MasterInterface:
                     "status_code": resp.status_code,
                     "response_body": resp.text,
                     "worker_id": str(worker_id),
+                    "job_id": str(job_id),
                     "payload": payload,
                 },
             )
@@ -153,7 +166,11 @@ class MasterInterface:
         except requests.RequestException as e:
             logger.error(
                 "Job result submission request failed",
-                extra={"worker_id": str(worker_id), "error": str(e)},
+                extra={
+                    "worker_id": str(worker_id),
+                    "job_id": str(job_id),
+                    "error": str(e),
+                },
                 exc_info=True,
             )
             return False

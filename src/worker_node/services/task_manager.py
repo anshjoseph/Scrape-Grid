@@ -9,6 +9,7 @@ from uuid import UUID, uuid4
 from libs.scrape_worker import ScrapeWorker, ScrapeWorkerError, BrowserLaunchError, NavigationError, HTMLExtractionError, ContentParsingError
 from typing import Dict, Optional, List
 from threading import Lock
+from libs.master_interface import MasterInterface
 
 
 logger = configure_logger(__file__)
@@ -29,6 +30,7 @@ class TaskManager:
         self._total_time = 0.0
         self.__config = get_config()
         self._thread_pool = ThreadPoolExecutor(max_workers=self.__config.workers)
+        self._master_ineterface = MasterInterface()
         self.__queue: Queue = Queue()
         
         # Store task results and futures
@@ -175,7 +177,25 @@ class TaskManager:
                 total_completed = self._successful_tasks + 1
                 self._total_time += exec_time
                 self._avg_time = self._total_time / total_completed
-                
+
+                # Send to the master server
+                try:
+                    if self.__config.use_callbacks:
+                        self._master_ineterface.add_job_result(
+                            worker_id=self.__config.worker_id,
+                            job_id=task_id,
+                            payload={
+                                "time_take": scrape_task.end_exec_time - scrape_task.start_exec_time,
+                                "format": scrape_task.format.value,
+                                "html_content": scrape_task.html_content,
+                                "output_content": scrape_task.output_content,
+                                "status": ScrapeTaskStatus.COMPLETE.value
+                            }
+
+                        )
+                except Exception as e:
+                    logger.error(f"error : {e}")
+                    logger.error("not able to send to the master server")    
                 # Update task info
                 self._tasks[task_id]["status"] = ScrapeTaskStatus.COMPLETE
                 self._tasks[task_id]["result"] = scrape_task

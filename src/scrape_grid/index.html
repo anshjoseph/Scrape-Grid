@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrape Grid - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #000000;
+            --secondary-dark: #1a1a1a;
+            --accent-gray: #333333;
+            --light-gray: #f8f9fa;
+            --border-gray: #dee2e6;
+            --success-green: #28a745;
+            --danger-red: #dc3545;
+            --warning-yellow: #ffc107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--border-gray);
+            padding: 2rem 0;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-brand h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .sidebar-brand p {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-right: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--light-gray);
+            color: var(--primary-dark);
+        }
+
+        .nav-item.active {
+            background: var(--light-gray);
+            border-right-color: var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        .nav-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-gray);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-gray);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .worker-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-gray);
+        }
+
+        .worker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .worker-name {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .worker-id {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-family: monospace;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: var(--success-green);
+        }
+
+        .btn-dark-custom {
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-dark-custom:hover {
+            background: var(--secondary-dark);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.1);
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            background: var(--primary-dark);
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-gray);
+        }
+
+        .task-url {
+            font-size: 0.875rem;
+            color: #6c757d;
+            word-break: break-all;
+        }
+
+        .metric-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-item {
+            flex: 1;
+        }
+
+        .metric-item label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-item .value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        .url-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .url-input-group input {
+            border-radius: 6px;
+        }
+
+        .result-preview {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .btn-download {
+            background: white;
+            color: var(--primary-dark);
+            border: 1px solid var(--primary-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+        }
+
+        .btn-download:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>Scrape Grid</h2>
+            <p>Distributed Web Scraping</p>
+        </div>
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-chart-line"></i>Dashboard
+        </div>
+        <div class="nav-item" data-page="workers">
+            <i class="fas fa-server"></i>Workers
+        </div>
+        <div class="nav-item" data-page="tasks">
+            <i class="fas fa-tasks"></i>Tasks
+        </div>
+        <div class="nav-item" data-page="create">
+            <i class="fas fa-plus-circle"></i>Create Task
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard Page -->
+        <div class="page-content active" id="dashboard">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Monitor your scraping infrastructure in real-time</p>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f0f0f0;">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-value" id="total-workers">0</div>
+                        <div class="stat-label">Active Workers</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #d4edda;">
+                            <i class="fas fa-check-circle" style="color: var(--success-green);"></i>
+                        </div>
+                        <div class="stat-value" id="completed-tasks">0</div>
+                        <div class="stat-label">Completed Tasks</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fff3cd;">
+                            <i class="fas fa-spinner" style="color: var(--warning-yellow);"></i>
+                        </div>
+                        <div class="stat-value" id="processing-tasks">0</div>
+                        <div class="stat-label">Processing</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f8d7da;">
+                            <i class="fas fa-exclamation-circle" style="color: var(--danger-red);"></i>
+                        </div>
+                        <div class="stat-value" id="failed-tasks">0</div>
+                        <div class="stat-label">Failed Tasks</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid var(--border-gray);">
+                        <h5 class="mb-3">System Health</h5>
+                        <div id="health-status">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workers Page -->
+        <div class="page-content" id="workers">
+            <div class="page-header">
+                <h1>Workers</h1>
+                <p>Manage your worker nodes</p>
+            </div>
+            <div id="workers-list"></div>
+        </div>
+
+        <!-- Tasks Page -->
+        <div class="page-content" id="tasks">
+            <div class="page-header">
+                <h1>Tasks</h1>
+                <p>Monitor task execution and results</p>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="process-id-input" placeholder="Enter Process ID to check status">
+                <button class="btn btn-dark-custom mt-2" onclick="checkProcessStatus()">Check Status</button>
+            </div>
+            <div id="tasks-list"></div>
+        </div>
+
+        <!-- Create Task Page -->
+        <div class="page-content" id="create">
+            <div class="page-header">
+                <h1>Create Task</h1>
+                <p>Submit new URLs for scraping</p>
+            </div>
+            <div style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid var(--border-gray);">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">URLs to Scrape</label>
+                    <div id="url-inputs">
+                        <div class="url-input-group">
+                            <input type="url" class="form-control" placeholder="https://example.com">
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-dark mt-2" onclick="addUrlInput()">
+                        <i class="fas fa-plus"></i> Add URL
+                    </button>
+                </div>
+                <button class="btn btn-dark-custom" onclick="submitBulkTask()">
+                    <i class="fas fa-paper-plane"></i> Submit Task
+                </button>
+                <div id="task-result" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+
+        // Navigation
+        $('.nav-item').click(function() {
+            $('.nav-item').removeClass('active');
+            $(this).addClass('active');
+            $('.page-content').removeClass('active');
+            const page = $(this).data('page');
+            $(`#${page}`).addClass('active');
+            
+            if (page === 'dashboard') loadDashboard();
+            if (page === 'workers') loadWorkers();
+        });
+
+        // Load Dashboard
+        function loadDashboard() {
+            $.get(`${API_BASE}/tasks/health`, function(data) {
+                $('#total-workers').text(data.workers.active_workers);
+                $('#completed-tasks').text(data.tasks.total_completed);
+                $('#processing-tasks').text(data.tasks.currently_processing);
+                
+                const healthHtml = `
+                    <div class="metric-row">
+                        <div class="metric-item">
+                            <label>Status</label>
+                            <div class="value text-success">${data.status}</div>
+                        </div>
+                        <div class="metric-item">
+                            <label>Active Processes</label>
+                            <div class="value">${data.processes.active}</div>
+                        </div>
+                        <div class="metric-item">
+                            <label>Total Processes</label>
+                            <div class="value">${data.processes.total}</div>
+                        </div>
+                        <div class="metric-item">
+                            <label>Thread Pool</label>
+                            <div class="value">${data.thread_pool.max_workers}</div>
+                        </div>
+                    </div>
+                `;
+                $('#health-status').html(healthHtml);
+            });
+        }
+
+        // Load Workers
+        function loadWorkers() {
+            $.get(`${API_BASE}/workers/`, function(data) {
+                let html = '';
+                data.forEach(worker => {
+                    const successRate = worker.successful_tasks + worker.failed_tasks > 0 
+                        ? ((worker.successful_tasks / (worker.successful_tasks + worker.failed_tasks)) * 100).toFixed(1) 
+                        : 'N/A';
+                    
+                    html += `
+                        <div class="worker-card">
+                            <div class="worker-header">
+                                <div>
+                                    <div class="worker-name">${worker.worker_name}</div>
+                                    <div class="worker-id">${worker.worker_id}</div>
+                                </div>
+                                <span class="status-badge status-active">Active</span>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-item">
+                                    <label>Queued</label>
+                                    <div class="value">${worker.queued_tasks}</div>
+                                </div>
+                                <div class="metric-item">
+                                    <label>Active</label>
+                                    <div class="value">${worker.active_tasks}</div>
+                                </div>
+                                <div class="metric-item">
+                                    <label>Success</label>
+                                    <div class="value text-success">${worker.successful_tasks}</div>
+                                </div>
+                                <div class="metric-item">
+                                    <label>Failed</label>
+                                    <div class="value text-danger">${worker.failed_tasks}</div>
+                                </div>
+                                <div class="metric-item">
+                                    <label>Success Rate</label>
+                                    <div class="value">${successRate}${successRate !== 'N/A' ? '%' : ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                $('#workers-list').html(html || '<p class="text-muted">No workers available</p>');
+            });
+        }
+
+        // Add URL Input
+        function addUrlInput() {
+            $('#url-inputs').append(`
+                <div class="url-input-group">
+                    <input type="url" class="form-control" placeholder="https://example.com">
+                </div>
+            `);
+        }
+
+        // Submit Bulk Task
+        function submitBulkTask() {
+            const urls = [];
+            $('#url-inputs input').each(function() {
+                const url = $(this).val().trim();
+                if (url) urls.push(url);
+            });
+
+            if (urls.length === 0) {
+                $('#task-result').html('<div class="alert alert-warning">Please enter at least one URL</div>');
+                return;
+            }
+
+            $.ajax({
+                url: `${API_BASE}/tasks/bulk`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ urls }),
+                success: function(data) {
+                    $('#task-result').html(`
+                        <div class="alert alert-success">
+                            <strong>Success!</strong> Process ID: <code>${data.process_id}</code><br>
+                            Total URLs: ${data.total_urls}
+                        </div>
+                    `);
+                    $('#url-inputs').html('<div class="url-input-group"><input type="url" class="form-control" placeholder="https://example.com"></div>');
+                },
+                error: function() {
+                    $('#task-result').html('<div class="alert alert-danger">Failed to create task</div>');
+                }
+            });
+        }
+
+        // Check Process Status
+        function checkProcessStatus() {
+            const processId = $('#process-id-input').val().trim();
+            if (!processId) return;
+
+            $.get(`${API_BASE}/tasks/process/${processId}`, function(data) {
+                let html = `
+                    <div class="task-card">
+                        <h6>Process: ${data.process_id}</h6>
+                        <div class="mb-2">
+                            <span class="status-badge ${data.status === 'complete' ? 'status-active' : ''}">${data.status}</span>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" style="width: ${data.progress_percentage}%"></div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-item">
+                                <label>Total</label>
+                                <div class="value">${data.total_urls}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Completed</label>
+                                <div class="value">${data.completed_tasks}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Success</label>
+                                <div class="value text-success">${data.successful_tasks}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Failed</label>
+                                <div class="value text-danger">${data.failed_tasks}</div>
+                            </div>
+                        </div>
+                `;
+
+                if (data.results && data.results.length > 0) {
+                    html += '<h6 class="mt-3">Results:</h6>';
+                    data.results.forEach((result, idx) => {
+                        html += `
+                            <div class="mt-2">
+                                <small class="text-muted">Result ${idx + 1} - ${result.format} (${result.time_taken.toFixed(2)}s)</small>
+                                <div class="result-preview">${result.output_preview}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += '</div>';
+                $('#tasks-list').html(html);
+            }).fail(function() {
+                $('#tasks-list').html('<div class="alert alert-danger">Process not found</div>');
+            });
+        }
+
+        // Initial load
+        loadDashboard();
+        setInterval(loadDashboard, 5000);
+    </script>
+</body>
+</html>

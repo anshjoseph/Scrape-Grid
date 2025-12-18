@@ -3,6 +3,11 @@ from pydantic import BaseModel
 from uuid import UUID
 from services.worker_manager import get_worker_manager, WorkerManager
 from models.scrape_task import WorkerScrapeTaskRes
+from utils.log import configure_logger
+from services.task_manager import get_task_manager, TaskManager
+
+
+logger = configure_logger(__file__)
 
 # appi router
 _router = APIRouter(prefix="/workers", tags=["Workers"])
@@ -66,5 +71,12 @@ async def get_workers(worker_id:UUID,  worker_manager:WorkerManager = Depends(ge
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 @_router.post("/{worker_id}/jobs/{task_id}/add-result")
-async def add_job_after_complete(worker_id:UUID, task_id:UUID, data: WorkerScrapeTaskRes):
-    pass
+async def add_job_after_complete(
+    worker_id:UUID, 
+    task_id:UUID, 
+    data: WorkerScrapeTaskRes, 
+    task_manager : TaskManager = Depends(get_task_manager),
+    worker_manager:WorkerManager = Depends(get_worker_manager)):
+    logger.info(f"{worker_id}, {task_id}")
+    if worker_manager.get_worker_status(worker_id) != None:
+        task_manager.task_complete(worker_id, task_id, data)

@@ -89,15 +89,22 @@ Workers are stateless and can be scaled horizontally.
 - Content extraction pipelines
 - Research & analytics
 
+## Screen Short
+!["dashboard"](res/dashboard.png)
+!["workers"](res/workers.png)
+!["tasks"](res/tasks.png)
+!["create_task"](res/create_task.png)
+
+
 ## 🛠 Tech Stack
 
 *Actual stack may vary depending on implementation*
 
 - Python (FastAPI / AsyncIO)
-- Playwright / Requests
-- Redis / Queue system
-- Docker & Kubernetes
-- REST / WebSocket APIs
+- Playwright
+- Queue system
+- Docker
+- REST
 
 ## 📦 Getting Started
 

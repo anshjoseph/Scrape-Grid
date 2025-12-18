@@ -6,5 +6,5 @@
     "wait_time" : 2,
     "headless" : true,
     "protocol" : "http",
-    "use_callbacks" : false
+    "use_callbacks" : true
 }

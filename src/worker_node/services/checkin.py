@@ -21,7 +21,7 @@ class CheckIn(Thread):
         self._worker_id = health.worker_id
         self._worker_name = health.worker_name
 
-        self._interval = getattr(self._config, "checkin_interval", 5)
+        self._interval = getattr(self._config, "checkin_interval", 120)
 
         logger.info(
             "CheckIn service initialized",
