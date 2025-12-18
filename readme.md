@@ -110,7 +110,7 @@ Workers are stateless and can be scaled horizontally.
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/scrape-grid.git
+git clone https://github.com/anshjoseph/Scrape-Grid
 cd scrape-grid
 ```
 
